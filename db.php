@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $host = "localhost";
 $user = "root";
-$pass = "Risenme@20";
+$pass = "your pswd";
 $db   = "Student_Perf";
 
 $conn = new mysqli($host, $user, $pass, $db);
