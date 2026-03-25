@@ -1,12 +1,11 @@
 <?php
-
+header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: http://localhost:5173");
-header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type");
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
+error_reporting(0);
+ini_set('display_errors', 0);
 
 $host = "localhost";
 $user = "root";
@@ -16,5 +15,10 @@ $db   = "Student_Perf";
 $conn = new mysqli($host, $user, $pass, $db);
 
 if ($conn->connect_error) {
-    die("Connection failed");
+    echo json_encode([
+        "success" => false,
+        "error" => "Database connection failed"
+    ]);
+    exit();
 }
+?>
