@@ -12,27 +12,30 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost/registerstud.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "http://localhost/Stud_Perf/registerstud.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+          role: role,
+        }),
       },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password,
-        role: role,
-      }),
-    });
+    );
 
-    const data = await response.json();
-    console.log("RESPONSE DATA:", data);
+    const text = await response.text();
+    console.log("SERVER RESPONSE:", text);
 
-    if (data.status === "success") {
+    if (text.includes("success")) {
       alert("Registration successful!");
       navigate("/"); // go to login
     } else {
-      alert(data.message);
+      alert("Registration failed. Please try again.");
     }
   };
 

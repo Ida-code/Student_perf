@@ -12,11 +12,11 @@ function Dashboard() {
   }
 
   function goToScope() {
-    navigate("/scope");
+    navigate("/scoperouter");
   }
 
   function logout() {
-    fetch("http://localhost/logoutstud.php", {
+    fetch("http://localhost/Stud_Perf/logoutstud.php", {
       credentials: "include",
     }).then(() => {
       navigate("/");
