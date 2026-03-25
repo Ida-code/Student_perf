@@ -2,84 +2,106 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 function QuestionsPage() {
-  const { topic } = useParams(); // Matches the :topic in your App.js
+  const { topic } = useParams();
   const navigate = useNavigate();
+
   const [questions, setQuestions] = useState([]);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [answers, setAnswers] = useState([]); // Stores {question_id, is_correct}
+  const [index, setIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch questions specifically for this topic
-    fetch(`http://localhost/getQuestions.php?topic=${topic}`)
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || !user.user_id) {
+      setError("User not logged in");
+      return;
+    }
+
+    fetch(`http://localhost/Stud_Perf/getQuestions.php?topic=${topic}`)
       .then((res) => res.json())
       .then((data) => setQuestions(data))
-      .catch((err) => console.error("Error fetching questions:", err));
+      .catch(() => setError("Failed to load questions"));
   }, [topic]);
 
-  const handleAnswer = (selectedOption) => {
-    const isCorrect = selectedOption === questions[currentIdx].correct_answer;
+  const handleAnswer = (option) => {
+    const q = questions[index];
 
-    // Save answer state locally
-    const newAnswer = {
-      question_id: questions[currentIdx].id,
-      is_correct: isCorrect,
+    const ans = {
+      question_id: q.id,
+      is_correct: option === q.correct_answer,
     };
-    const updatedAnswers = [...answers, newAnswer];
-    setAnswers(updatedAnswers);
 
-    if (currentIdx < questions.length - 1) {
-      setCurrentIdx(currentIdx + 1);
+    const updated = [...answers, ans];
+    setAnswers(updated);
+
+    if (index < questions.length - 1) {
+      setIndex(index + 1);
     } else {
-      submitQuiz(updatedAnswers);
+      submitQuiz(updated);
     }
   };
 
   const submitQuiz = async (finalAnswers) => {
-    const response = await fetch("http://localhost/SubmitResult.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers: finalAnswers }),
-      credentials: "include",
-    });
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
 
-    if (response.ok) {
-      // Per your requirement: Take them back to Topic Selection
+      const payload = {
+        user_id: user.user_id,
+        topic: topic,
+        answers: finalAnswers,
+      };
+
+      console.log("Sending:", payload);
+
+      const res = await fetch("http://localhost/Stud_Perf/SubmitResult.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      alert(`Score: ${data.score}/${data.total}`);
+
       navigate("/topicselection");
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
     }
   };
 
-  if (questions.length === 0)
-    return <div>Loading questions for {topic}...</div>;
+  if (error) return <h2>{error}</h2>;
+  if (questions.length === 0) return <h2>Loading...</h2>;
 
   return (
-    <div className="quiz-page-container">
-      {/* Progress bar at the top */}
-      <div className="progress-status">
-        <p>
-          {topic} Quiz: Question {currentIdx + 1} of {questions.length}
-        </p>
-        <div className="bar-bg">
-          <div
-            className="bar-fill"
-            style={{ width: `${((currentIdx + 1) / questions.length) * 100}%` }}
-          ></div>
-        </div>
-      </div>
+    <div>
+      <h2>{topic}</h2>
 
-      <div className="question-card">
-        <h3 className="question-text">{questions[currentIdx].question}</h3>
-        <div className="options-grid">
-          {["optionA", "optionB", "optionC", "optionD"].map((key) => (
-            <button
-              key={key}
-              className="option-button"
-              onClick={() => handleAnswer(questions[currentIdx][key])}
-            >
-              <span className="option-label">{key.slice(-1)}</span>
-              {questions[currentIdx][key]}
-            </button>
-          ))}
-        </div>
+      <h3>{questions[index].question}</h3>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <button onClick={() => handleAnswer(questions[index].optionA)}>
+          A. {questions[index].optionA}
+        </button>
+
+        <button onClick={() => handleAnswer(questions[index].optionB)}>
+          B. {questions[index].optionB}
+        </button>
+
+        <button onClick={() => handleAnswer(questions[index].optionC)}>
+          C. {questions[index].optionC}
+        </button>
+
+        <button onClick={() => handleAnswer(questions[index].optionD)}>
+          D. {questions[index].optionD}
+        </button>
       </div>
     </div>
   );

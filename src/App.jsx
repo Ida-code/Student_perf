@@ -5,8 +5,12 @@ import Dashboard from "./Dashboard";
 import TopicSelection from "./TopicSelection";
 import QuestionsPage from "./QuestionsPage";
 import ResultChart from "./ResultChart";
-import ScopePage from "./ScopePage";
+
 import Logout from "./Logout";
+import Roadmap from "./Roadmap";
+import ScopeRouter from "./ScopeRouter";
+import ScopePageClg from "./ScopePageClg";
+import ScopePageCmp from "./ScopePageCmp";
 
 function App() {
   return (
@@ -18,8 +22,14 @@ function App() {
         <Route path="/topicselection" element={<TopicSelection />} />
         <Route path="/questionspage/:topic" element={<QuestionsPage />} />
         <Route path="/resultchart" element={<ResultChart />} />
-        <Route path="/scope" element={<ScopePage />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/scoperouter" element={<ScopeRouter />} />
+        <Route path="/scope/clg" element={<ScopePageClg />} />
+        <Route path="/scope/cmp" element={<ScopePageCmp />} />
+
+        {/*<Route path="/roadmap/:role" element={<RoleRoadmap />} />*/}
+
+        <Route path="/roadmap/:type" element={<Roadmap />} />
       </Routes>
     </Router>
   );

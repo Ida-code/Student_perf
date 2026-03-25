@@ -5,27 +5,29 @@ function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Call the PHP backend to destroy the session
-    fetch("http://localhost/logoutstud.php", {
-      credentials: "include", // Essential to send/clear session cookies
+    // Call backend (optional if you're not using PHP sessions)
+    fetch("http://localhost/Stud_Perf/logoutstud.php", {
+      method: "POST",
     })
-      .then((response) => {
-        // 2. Clear any local storage if you used it for user data
-        localStorage.removeItem("user_name");
-
-        // 3. Redirect to the Login page
-        navigate("/");
-      })
       .catch((err) => {
-        console.error("Logout failed:", err);
-        // Even if fetch fails, we usually force the user back to Login
+        console.error("Logout API error:", err);
+      })
+      .finally(() => {
+        // ✅ CLEAR CORRECT KEYS
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+
+        // (optional) clear everything
+        // localStorage.clear();
+
+        // ✅ Redirect to login
         navigate("/");
       });
   }, [navigate]);
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <p>Logging you out safely...</p>
+      <p>Logging you out...</p>
     </div>
   );
 }

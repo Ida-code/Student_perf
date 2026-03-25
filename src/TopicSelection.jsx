@@ -13,7 +13,9 @@ function TopicSelection() {
   ];
 
   useEffect(() => {
-    fetch("http://localhost/getCompletedTopics.php", { credentials: "include" })
+    fetch("http://localhost/getCompletedTopics.php", {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
