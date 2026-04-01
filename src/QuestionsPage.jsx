@@ -15,7 +15,7 @@ function QuestionsPage() {
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user || !user.user_id) {
-      setError("User not logged in.Please Login again.");
+      setError("User not logged in");
       return;
     }
 
