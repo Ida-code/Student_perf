@@ -28,7 +28,7 @@ function Logout() {
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <p>Logging you out...Don't forget to come back again</p>
+      <p>Logging you out</p>
     </div>
   );
 }
