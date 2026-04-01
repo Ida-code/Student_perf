@@ -10,7 +10,12 @@ pipeline {
 
         stage('Build & Deploy') {
             steps {
-                bat 'docker-compose up -d --build'
+                
+               bat '''
+                docker rm -f DOCKER-MYSQL || exit 0
+                docker-compose down || exit 0
+                docker-compose up -d --build
+                '''
             }
         }
     }
