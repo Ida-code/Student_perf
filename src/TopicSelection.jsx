@@ -55,7 +55,7 @@ function TopicSelection() {
             textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
           }}
         >
-          Choose a Topic to Master
+          Choose a Topic to crack
         </h1>
         <p
           style={{
