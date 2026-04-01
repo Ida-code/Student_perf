@@ -29,25 +29,23 @@ pipeline {
         }
 
         stage('Docker Deploy') {
-            steps {
-                script {
-                    // 1. Force a clean state to fix the "Snapshot Not Found" error
-                    echo 'Clearing corrupted Docker builder cache...'
-                    bat 'docker builder prune -f'
-                    
-                    // 2. Build and Start
-                    echo 'Building and starting containers...'
-                    bat 'docker-compose up -d --build'
-                    
-                    // 3. Jenkins-safe Wait (replaces the 'timeout' command)
-                    echo 'Waiting 15 seconds for services to initialize...'
-                    sleep time: 15, unit: 'SECONDS'
-                    
-                    // 4. Verify status
-                    bat 'docker-compose ps'
-                }
-            }
+    steps {
+        script {
+            // 1. Clear the corrupted build cache causing the 'Snapshot' error
+            bat 'docker builder prune -f'
+            
+            // 2. Kill any "zombie" containers and start fresh
+            echo 'Building and starting containers...'
+            bat 'docker-compose up -d --build'
+            
+            // 3. Jenkins-safe wait (Replaces 'timeout /t 10' which crashes Jenkins)
+            echo 'Waiting for services to initialize...'
+            sleep time: 15, unit: 'SECONDS'
+            
+            bat 'docker-compose ps'
         }
+    }
+}
 
         stage('Verify Deployment') {
             steps {
