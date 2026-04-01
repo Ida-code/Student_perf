@@ -22,3 +22,56 @@ pipeline {
         }
     }
 }
+
+
+
+
+pipeline {
+    agent any
+
+    triggers {
+        // This tells Jenkins to build when it receives a GitHub webhook push
+        githubPush()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Using the specific SCM checkout syntax with your credentialsId
+                checkout scmGit(
+                    branches: [[name: '*/main']], 
+                    extensions: [], 
+                    userRemoteConfigs: [[
+                        credentialsId: 'githubtoken', 
+                        url: 'https://github.com/Ida-code/Student_perf.git'
+                    ]]
+                )
+            }
+        }
+
+        stage('Build & Deploy') {
+            steps {
+                bat '''
+                @echo off
+                :: Stop and remove existing containers if they exist
+                docker-compose down --remove-orphans
+                
+                :: Rebuild and start services in detached mode
+                docker-compose up -d --build
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution finished.'
+        }
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed. Check the Docker logs.'
+        }
+    }
+}
