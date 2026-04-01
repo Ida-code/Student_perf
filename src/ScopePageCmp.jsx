@@ -28,7 +28,7 @@ function ScopePageCmp() {
         return JSON.parse(stored);
       }
     } catch (e) {
-      console.log("Invalid user data");
+      console.log("Invalid user data.Check again and try again.");
     }
     return null;
   })();
