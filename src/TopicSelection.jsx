@@ -55,7 +55,7 @@ function TopicSelection() {
             textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
           }}
         >
-          Choose Your Topic to Practice
+          Choose Your Topic to Master
         </h1>
         <p
           style={{
