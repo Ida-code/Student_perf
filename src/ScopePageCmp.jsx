@@ -979,7 +979,7 @@ function ScopePageCmp() {
                       fontWeight: "500",
                     }}
                   >
-                    💡 <strong>Click any red dot</strong> to view details |{" "}
+                    💡 <strong>Click any dot</strong> to view details |{" "}
                     <strong>Click anywhere on the image</strong> to add a label
                   </div>
                 )}
