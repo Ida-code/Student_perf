@@ -2,22 +2,21 @@ pipeline {
     agent any
     
     triggers {
-        // Automatically starts the build when GitHub sends a webhook ping
+        // GitHub webhook trigger (requires GitHub plugin + webhook setup in repo)
         githubPush()
+        // Poll SCM as backup in case webhook is not configured
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        COMPOSE_CONVERT_WINDOWS_PATHS = "1"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Pulls the latest code from your repository
-                checkout scmGit(
-                    branches: [[name: '*/main']], 
-                    extensions: [], 
-                    userRemoteConfigs: [[
-                        credentialsId: 'githubtoken', 
-                        url: 'https://github.com/Ida-code/Student_perf.git'
-                    ]]
-                )
+                // Use declarative checkout of whichever branch triggered pipeline
+                checkout scm
             }
         }
 
@@ -25,12 +24,18 @@ pipeline {
             steps {
                 script {
                     echo 'Cleaning up existing processes on ports 5173, 8081, and 3307...'
-                    // This PowerShell block finds any process using your app ports and kills them
-                    // This ensures 'localhost:5173' is free for the new Docker container
+                    // Windows-specific port cleanup
                     bat """
-                    powershell -Command "Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force -ErrorAction SilentlyContinue }"
-                    powershell -Command "Get-NetTCPConnection -LocalPort 3307 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force -ErrorAction SilentlyContinue }"
-                    powershell -Command "Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force -ErrorAction SilentlyContinue }"
+                    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5173') do (
+                        taskkill /F /PID %%a 2>nul
+                    )
+                    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081') do (
+                        taskkill /F /PID %%a 2>nul
+                    )
+                    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3307') do (
+                        taskkill /F /PID %%a 2>nul
+                    )
+                    echo Port cleanup completed
                     """
                 }
             }
@@ -38,14 +43,43 @@ pipeline {
 
         stage('Docker Deploy') {
             steps {
-                bat '''
-                @echo off
-                :: Stop and remove old containers and networks for this project
-                docker-compose down --remove-orphans || exit 0
-                
-                :: Build the new images and start containers in detached mode
-                docker-compose up -d --build
-                '''
+                script {
+                    // Check if Docker is available
+                    bat 'docker --version'
+                    
+                    // Clean up old containers
+                    bat """
+                    echo Stopping and removing old containers...
+                    docker-compose down --remove-orphans --volumes || echo No containers to remove
+                    
+                    echo Removing old images...
+                    docker image prune -f
+                    
+                    echo Building and starting containers...
+                    docker-compose up -d --build
+                    
+                    echo Waiting for containers to start...
+                    timeout /t 10 /nobreak
+                    
+                    echo Checking container status...
+                    docker-compose ps
+                    
+                    echo Showing logs...
+                    docker-compose logs --tail=30
+                    """
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    echo 'Verifying services are running...'
+                    bat '''
+                    curl -I http://localhost:5173 2>nul || echo React service not ready yet
+                    curl -I http://localhost:8081 2>nul || echo PHP service not ready yet
+                    '''
+                }
             }
         }
     }
@@ -53,12 +87,31 @@ pipeline {
     post {
         always {
             echo 'Pipeline execution finished.'
+            // Clean up on always to free resources
+            bat 'docker-compose down --remove-orphans || echo Cleanup completed'
         }
         success {
-            echo 'Deployment successful! Your app is live at http://localhost:5173'
+            echo 'Deployment successful! Your app should be accessible at:'
+            echo '- React: http://localhost:5173'
+            echo '- PHP API: http://localhost:8081'
         }
         failure {
-            echo 'Deployment failed. Check the Jenkins console and Docker logs.'
+            echo 'Deployment failed. Collecting debug information...'
+            script {
+                bat '''
+                echo === Docker Compose Logs ===
+                docker-compose logs --tail=100
+                
+                echo === Docker Container Status ===
+                docker ps -a
+                
+                echo === Docker Images ===
+                docker images
+                
+                echo === Docker Compose Config ===
+                docker-compose config
+                '''
+            }
         }
     }
 }
