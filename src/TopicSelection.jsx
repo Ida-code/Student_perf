@@ -31,7 +31,7 @@ function TopicSelection() {
         textAlign: "center",
         minHeight: "100vh",
         background:
-          "linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%)",
+          "linear-gradient(135deg, #667eea 0%, #764ba2 25%, #4facfe 75%, #00f2fe 100%)",
         backgroundSize: "400% 400%",
         animation: "gradient 15s ease infinite",
         position: "relative",
@@ -89,7 +89,7 @@ function TopicSelection() {
                   width: "320px",
                   backgroundColor: isDone
                     ? "#888"
-                    : ["#ff6b6b", "#4ecdc4", "#45b7d1"][index],
+                    : ["#45b7d1", "#45b7d1", "#45b7d1"][index],
                   color: "white",
                   border: "none",
                   borderRadius: "10px",

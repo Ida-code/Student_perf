@@ -1,9 +1,6 @@
-version: "3.8"
-
 services:
   mysql:
     image: mysql:8
-    container_name: DOCKER-MYSQL
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: Risenme@20
@@ -15,8 +12,7 @@ services:
 
   php:
     image: php:8.2-apache
-    container_name: php-backend
-    command: sh -c "docker-php-ext-install mysqli && apache2-foreground"
+    command: sh -c "chmod -R 755 /var/www/html && docker-php-ext-install mysqli && apache2-foreground"
     volumes:
       - ./Stud_Perf:/var/www/html
     ports:
@@ -30,11 +26,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: react-frontend
     ports:
       - "5173:5173"
-    volumes:
-      - ./src:/app/src
     networks:
       - app-network
     depends_on:
