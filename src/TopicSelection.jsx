@@ -64,7 +64,7 @@ function TopicSelection() {
             fontSize: "1.1em",
           }}
         >
-          Master each topic to unlock your potential!
+          Complete each topic to unlock your potential and track your progress!
         </p>
 
         <div

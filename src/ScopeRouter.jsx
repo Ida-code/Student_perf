@@ -41,7 +41,7 @@ function ScopeRouter() {
             Please Login
           </h2>
           <p style={{ color: "#666" }}>
-            You need to log in to access this page
+            You need to log in to access your personalized scope
           </p>
         </div>
       </div>
