@@ -2,16 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ida-code/Student_perf.git'
+                git 'https://github.com/your-repo-link.git'
             }
         }
 
         stage('Build & Deploy') {
             steps {
-                bat 'docker-compose up -d --build'
+                bat '''
+                docker-compose down
+                docker-compose up -d --build
+                '''
             }
         }
+
     }
 }
