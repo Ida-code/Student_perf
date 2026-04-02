@@ -6,21 +6,25 @@ services:
       MYSQL_ROOT_PASSWORD: Risenme@20
       MYSQL_DATABASE: student_perf
     ports:
-      - "3307:3306"
+      - "3307:3306" # Connect from your laptop via 3307
     networks:
       - app-network
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRisenme@20"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   php:
     image: php:8.2-apache
-    # This installs the mysqli extension needed for PHP to talk to MySQL
-    command: sh -c "docker-php-ext-install mysqli && a2enmod rewrite && apache2-foreground"
+    # Improved command to ensure it doesn't fail on restart
+    command: >
+      sh -c "apt-get update && apt-get install -y libpng-dev && 
+      docker-php-ext-install mysqli && 
+      a2enmod rewrite && 
+      apache2-foreground"
     volumes:
       - ./Stud_Perf:/var/www/html
     ports:
@@ -39,14 +43,14 @@ services:
       - "5173:5173"
     environment:
       VITE_PORT: 5173
-      WATCHPACK_POLLING: "true"
+      # These two are CRITICAL for React to update on Windows/WSL2
+      WATCHPACK_POLLING: "true" 
       CHOKIDAR_USEPOLLING: "true"
-      WDS_SOCKET_PORT: 5173
+      WDS_SOCKET_PORT: 0 # Change to 0 or 5173 for HMR to work through ngrok
     networks:
       - app-network
     depends_on:
-      php:
-        condition: service_started
+      - php
     restart: unless-stopped
     stdin_open: true
     tty: true
@@ -56,4 +60,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  mysql_data: # Corrected syntax
