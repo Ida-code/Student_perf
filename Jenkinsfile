@@ -15,16 +15,15 @@ pipeline {
             }
         }
 
-        stage('Docker Deploy') {
+     stage('Docker Deploy') {
             steps {
                 // 1. Shut down any old containers and rebuild fresh
                 bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
                 bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
                 
-                // 2. CRITICAL: Wait for MySQL to finish initializing 
-                // (otherwise tests will fail with "Connection Refused")
+                // 2. Updated Wait Command
                 echo 'Waiting 20 seconds for Database to initialize...'
-                bat 'timeout /t 20 /nobreak'
+                bat 'ping 127.0.0.1 -n 20 > nul' 
             }
         }
 
