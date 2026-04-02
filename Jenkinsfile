@@ -20,13 +20,17 @@ pipeline {
     }
 }
 
-        stage('Docker Deploy') {
-            steps {
-                bat 'docker compose down'
-                // --build ensures your React/PHP changes are actually applied
-                bat 'docker-compose up -d --build'
-            }
-        }
+       stage('Docker Deploy') {
+    environment {
+        // This tells Docker to talk to your local Docker Desktop engine
+        DOCKER_HOST = 'tcp://127.0.0.1:2375'
+    }
+    steps {
+        // Use the absolute path to the docker executable
+        bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
+        bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
+    }
+}
         
         stage('Verify Deployment') {
             steps {
