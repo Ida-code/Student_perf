@@ -1,15 +1,11 @@
 pipeline {
     agent any
 
-    environment {
-        // Force Jenkins to use the TCP port we opened in Docker Settings
-        DOCKER_HOST = 'tcp://127.0.0.1:2375'
-        
-        // Disable BuildKit to avoid the "pipe/BuildServer" errors on Windows
-        DOCKER_BUILDKIT = '0'
-        COMPOSE_HTTP_TIMEOUT = '200'
-    }
-
+   environment {
+    // This uses the direct Windows "tunnel" instead of the network port
+    DOCKER_HOST = 'npipe:////./pipe/docker_engine'
+    DOCKER_BUILDKIT = '0'
+}
     stages {
         stage('Checkout') {
             steps {
