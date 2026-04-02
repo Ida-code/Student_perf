@@ -13,10 +13,10 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Unit Tests') {
+        stage('Test Cases') {
     steps {
-        // Run the PHPUnit tests we just set up
-        bat 'vendor/bin/phpunit tests'
+        // Use 'bat' for Windows commands
+        bat 'php .\\vendor\\bin\\phpunit tests' 
     }
 }
 
