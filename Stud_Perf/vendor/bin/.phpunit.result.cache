@@ -1,1 +1,1 @@
-{"version":2,"defects":[],"times":{"DatabaseTest::testDatabaseConnection":0.029}}
+{"version":2,"defects":{"DatabaseTest::testDatabaseConnection":8},"times":{"DatabaseTest::testDatabaseConnection":3.612}}

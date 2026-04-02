@@ -1,37 +1,40 @@
 pipeline {
     agent any
 
-  environment {
-    // We use the 'docker_engine' pipe for general commands
-    // Jenkins handles this better than the BuildServer pipe
-    DOCKER_HOST = 'npipe:////./pipe/docker_engine'
-    DOCKER_BUILDKIT = '0' 
-}
+    environment {
+        DOCKER_HOST = 'npipe:////./pipe/docker_engine'
+        DOCKER_BUILDKIT = '0'
+        // Pointing to your Jenkins Docker config
+        DOCKER_CONFIG = 'C:\\ProgramData\\Jenkins\\.jenkins\\.docker'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stage('Test Cases') {
-    steps {
-        // Point to the PHPUnit batch file AND the absolute path of your test file
-        bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" "C:\\Users\\idash\\Demo_Project\\Stud_Perf\\tests\\DatabaseTest.php"'
-    }
-}
 
-       stage('Docker Deploy') {
-    environment {
-        // This tells Docker NOT to look for the windows credential manager
-        DOCKER_CONFIG = 'C:\\ProgramData\\Jenkins\\.jenkins\\.docker'
-    }
-    steps {
-        // We add --no-cache to ensure it's a fresh build for your report
-        bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
-        bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
-    }
-}
-        
+        stage('Docker Deploy') {
+            steps {
+                // 1. Shut down any old containers and rebuild fresh
+                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
+                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
+                
+                // 2. CRITICAL: Wait for MySQL to finish initializing 
+                // (otherwise tests will fail with "Connection Refused")
+                echo 'Waiting 20 seconds for Database to initialize...'
+                bat 'timeout /t 20 /nobreak'
+            }
+        }
+
+        stage('Test Cases') {
+            steps {
+                // Now that Docker is UP and the DB is READY, run the tests
+                bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" "C:\\Users\\idash\\Demo_Project\\Stud_Perf\\tests\\DatabaseTest.php"'
+            }
+        }
+
         stage('Verify Deployment') {
             steps {
                 bat 'docker ps'
