@@ -13,6 +13,12 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Unit Tests') {
+    steps {
+        // Run the PHPUnit tests we just set up
+        bat 'vendor/bin/phpunit tests'
+    }
+}
 
         stage('Docker Deploy') {
             steps {
