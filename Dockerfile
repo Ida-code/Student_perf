@@ -2,6 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Ensure node is in PATH
+ENV PATH="/usr/local/bin:$PATH"
+
 # Copy package files and install dependencies first for layer caching
 COPY package*.json ./
 RUN npm install --legacy-peer-deps

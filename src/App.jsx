@@ -8,7 +8,7 @@ import QuestionsPage from "./QuestionsPage";
 import ResultChart from "./ResultChart";
 
 import Logout from "./logout";
-import Roadmap from "./Roadmap";
+import Roadmap from "./roadmap";
 import ScopeRouter from "./ScopeRouter";
 import ScopePageClg from "./ScopePageClg";
 import ScopePageCmp from "./ScopePageCmp";
