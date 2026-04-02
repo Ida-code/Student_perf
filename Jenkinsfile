@@ -22,7 +22,7 @@ pipeline {
 
         stage('Docker Deploy') {
             steps {
-                bat 'docker-compose down'
+                bat 'docker compose down'
                 // --build ensures your React/PHP changes are actually applied
                 bat 'docker-compose up -d --build'
             }
