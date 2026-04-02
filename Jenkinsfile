@@ -1,53 +1,83 @@
 pipeline {
     agent any
 
+    // Ensure the NodeJS tool is defined in Manage Jenkins > Tools with the name 'node'
+    tools {
+        nodejs 'node'
+    }
+
     environment {
-        // Your existing Docker paths
+        // Docker Configuration
         DOCKER_HOST = 'npipe:////./pipe/docker_engine'
         DOCKER_BUILDKIT = '0' 
         DOCKER_CONFIG = 'C:\\ProgramData\\Jenkins\\.jenkins\\.docker'
-        // Add Node to PATH if it's not globally recognized
-        NODEJS_HOME = tool name: 'node', type: 'nodejs'
+        
+        // Absolute path to the Docker executable on your Windows machine
+        DOCKER_EXE = '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe"'
+        
+        // Absolute paths for PHPUnit and your local project test files
+        PHPUNIT_BIN = '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat"'
+        DATABASE_TEST = '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\tests\\DatabaseTest.php"'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
+                // Pulls the latest code from your GitHub Repo
                 checkout scm
             }
         }
 
-        // --- NEW STAGE FOR VITEST ---
         stage('Frontend Tests') {
             steps {
-                dir('your-react-app-folder') { // Change this to your React folder name
-                    bat 'npm install' 
-                    bat 'npx vitest run'
+                script {
+                    // Update 'your-react-app-folder' to your actual React directory name
+                    // If your package.json is in the root, remove the dir() block
+                    dir('your-react-app-folder') { 
+                        bat 'npm install'
+                        bat 'npx vitest run'
+                    }
                 }
             }
         }
 
         stage('Docker Deploy') {
             steps {
-                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
-                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
+                // Shut down any existing containers to ensure a clean slate
+                bat "${env.DOCKER_EXE} compose down"
                 
-                echo 'Waiting 20 seconds for Database to initialize...'
+                // Build and start the containers in detached mode
+                bat "${env.DOCKER_EXE} compose up -d --build"
+                
+                // Critical SCM Step: Wait for MySQL to initialize before running tests
+                echo 'Waiting 20 seconds for Database and Services to stabilize...'
                 bat 'ping 127.0.0.1 -n 21 > nul' 
             }
         }
 
         stage('Backend & DB Tests') {
             steps {
-                // Your existing PHPUnit tests
-                bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" "C:\\Users\\idash\\Demo_Project\\Stud_Perf\\tests\\DatabaseTest.php"'
+                // Runs the PHPUnit test against the live Docker Database
+                // Using 127.0.0.1:3307 inside your DatabaseTest.php logic
+                bat "${env.PHPUNIT_BIN} ${env.DATABASE_TEST}"
             }
         }
         
         stage('Verify Deployment') {
             steps {
-                bat 'docker ps'
+                // Final audit check to see if containers are UP and Healthy
+                bat "${env.DOCKER_EXE} ps"
+                echo "Deployment Successful: Student Performance Tracking System is Live."
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution complete. Checking logs...'
+        }
+        failure {
+            echo 'Pipeline Failed. Please check the Console Output for debugging.'
         }
     }
 }
