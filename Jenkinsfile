@@ -31,10 +31,12 @@ pipeline {
         stage('Frontend Tests') {
             steps {
                 script {
-                    // Update 'your-react-app-folder' to your actual React directory name
-                    // If your package.json is in the root, remove the dir() block
+                    // This tells Jenkins to enter the 'src' folder in your GitHub repo
                     dir('src') { 
-                        bat 'npm install'
+                        // --legacy-peer-deps fixes the React 19 / Testing Library conflict
+                        bat 'npm install --legacy-peer-deps'
+                        
+                        // This runs the tests found inside this folder
                         bat 'npx vitest run'
                     }
                 }
