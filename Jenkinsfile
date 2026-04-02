@@ -22,11 +22,11 @@ pipeline {
 
        stage('Docker Deploy') {
     environment {
-        // This tells Docker to talk to your local Docker Desktop engine
-        DOCKER_HOST = 'tcp://127.0.0.1:2375'
+        // This tells Docker NOT to look for the windows credential manager
+        DOCKER_CONFIG = 'C:\\ProgramData\\Jenkins\\.jenkins\\.docker'
     }
     steps {
-        // Use the absolute path to the docker executable
+        // We add --no-cache to ensure it's a fresh build for your report
         bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose down'
         bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe" compose up -d --build'
     }
