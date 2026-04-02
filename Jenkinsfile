@@ -33,7 +33,7 @@ pipeline {
                 script {
                     // Update 'your-react-app-folder' to your actual React directory name
                     // If your package.json is in the root, remove the dir() block
-                    dir('your-react-app-folder') { 
+                    dir('src') { 
                         bat 'npm install'
                         bat 'npx vitest run'
                     }
