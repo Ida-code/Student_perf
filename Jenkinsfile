@@ -31,12 +31,10 @@ pipeline {
         stage('Frontend Tests') {
             steps {
                 script {
-                    // This tells Jenkins to enter the 'src' folder in your GitHub repo
                     dir('src') { 
-                        // --legacy-peer-deps fixes the React 19 / Testing Library conflict
                         bat 'npm install --legacy-peer-deps'
-                        
-                        // This runs the tests found inside this folder
+                        // This command will print the EXACT names of your files
+                        bat 'dir' 
                         bat 'npx vitest run'
                     }
                 }
