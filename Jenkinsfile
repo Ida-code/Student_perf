@@ -15,8 +15,8 @@ pipeline {
         }
         stage('Test Cases') {
     steps {
-        // Now Jenkins finds 'php' automatically because of the Env Variable
-        bat 'php .\\vendor\\bin\\phpunit tests'
+        // We use the full path to your local PHPUnit batch file
+        bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" tests'
     }
 }
 
