@@ -15,8 +15,8 @@ pipeline {
         }
         stage('Test Cases') {
     steps {
-        // We use the full path to your local PHPUnit batch file
-        bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" tests'
+        // Point to the PHPUnit batch file AND the absolute path of your test file
+        bat '"C:\\Users\\idash\\Demo_Project\\Stud_Perf\\vendor\\bin\\phpunit.bat" "C:\\Users\\idash\\Demo_Project\\Stud_Perf\\tests\\DatabaseTest.php"'
     }
 }
 
