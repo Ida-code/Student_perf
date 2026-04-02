@@ -32,7 +32,7 @@ pipeline {
     steps {
         script {
             // 1. Clear the corrupted build cache causing the 'Snapshot' error
-            bat 'docker builder prune -f'
+            
             
             // 2. Kill any "zombie" containers and start fresh
             echo 'Building and starting containers...'
