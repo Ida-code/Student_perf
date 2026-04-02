@@ -16,7 +16,7 @@ pipeline {
         stage('Test Cases') {
     steps {
         // Use 'bat' for Windows commands
-        bat 'php .\\vendor\\bin\\phpunit tests' 
+       bat 'C:\\xampp\\php\\php.exe .\\vendor\\bin\\phpunit tests' 
     }
 }
 
