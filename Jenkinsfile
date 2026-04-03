@@ -38,8 +38,12 @@ pipeline {
 
         stage('Docker Deploy') {
             when {
-                // GATEKEEPER: This stage only runs if the change is on 'main'
-                branch 'main'
+                // This is more robust for Webhooks
+                anyOf {
+                    branch 'main'
+                    expression { return env.BRANCH_NAME == 'main' }
+                    expression { return env.GIT_BRANCH == 'origin/main' }
+                }
             }
             steps {
                 echo "Branch is 'main'. Proceeding with Deployment..."
