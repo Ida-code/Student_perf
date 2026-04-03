@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     dir('src') { 
-                        bat 'npm install --legacy-peer-deps'
+                       bat 'npm install --legacy-peer-deps'
                         // This command will print the EXACT names of your files
                         bat 'dir' 
                         bat 'npx vitest run'
