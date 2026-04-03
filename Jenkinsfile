@@ -64,9 +64,11 @@ pipeline {
         }
         
         stage('Verify Deployment') {
-            when {
-                branch 'main'
-            }
+            anyOf {
+                    branch 'main'
+                    expression { return env.BRANCH_NAME == 'main' }
+                    expression { return env.GIT_BRANCH == 'origin/main' }
+                }
             steps {
                 bat "${env.DOCKER_EXE} ps"
                 echo "Deployment Successful: Student Performance Tracking System is Live."
