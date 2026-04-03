@@ -15,6 +15,6 @@ export default defineConfig({
   test: {
     globals: true,           // Allows you to use 'describe' and 'it' without importing them
     environment: 'jsdom',    // Simulates a browser for your React components
-    setupFiles: './src/setupTests.js', // Optional: for custom test setup
+    //setupFiles: './src/setupTests.js', // Optional: for custom test setup
   },
 })
