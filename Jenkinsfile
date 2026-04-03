@@ -29,17 +29,19 @@ pipeline {
         }
 
         stage('Frontend Tests') {
-            steps {
-                script {
-                    dir('src') { 
-                       bat 'npm install --legacy-peer-deps'
-                        // This command will print the EXACT names of your files
-                        bat 'dir' 
-                        bat 'npx vitest run'
-                    }
-                }
-            }
+    steps {
+        script {
+            // Run from the workspace root where package.json lives
+            bat 'npm install --legacy-peer-deps'
+            
+            // If Vitest is also configured in the root package.json:
+            bat 'npx vitest run'
+            
+            // Keep this for one run to verify your file locations in the log
+            bat 'dir' 
         }
+    }
+}
 
         stage('Docker Deploy') {
             steps {
