@@ -82,7 +82,7 @@ function QuizComponent() {
 
         // Show success message
         alert(
-          `Quiz completed! Your score: ${score}/${totalQuestions} (${percentage.toFixed(1)}%)`,
+          `Quiz completed Your score: ${score}/${totalQuestions} (${percentage.toFixed(1)}%)`,
         );
 
         // Return to topic selection after a short delay
